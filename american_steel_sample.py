@@ -1,3 +1,7 @@
+# transshipment problem
+# https://twiki.esc.auckland.ac.nz/do/view/OpsRes/TransshipmentProblem
+# taken from pulp
+
 from pulp import *
 
 # List of all the nodes

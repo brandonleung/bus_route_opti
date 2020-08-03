@@ -1,3 +1,6 @@
+# https://coin-or.github.io/pulp/CaseStudies/a_transportation_problem.html
+# taken from pulp
+
 from pulp import *
 
 # Creates a list of all the supply nodes
