@@ -1,4 +1,3 @@
-# Import PuLP modeller functions
 from pulp import *
 
 # List of all the nodes
