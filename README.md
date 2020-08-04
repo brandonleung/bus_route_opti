@@ -1,4 +1,4 @@
-# bus_route_opti
+# resource_opti
 
 using pulp to solve LP models
 https://github.com/coin-or/pulp

@@ -50,9 +50,6 @@ for w in Warehouses:
 for b in Bars:
     prob += lpSum([vars[w][b] for w in Warehouses])>=demand[b], "Sum_of_Products_into_Bar%s"%b
                    
-# The problem data is written to an .lp file
-prob.writeLP("BeerDistributionProblem.lp")
-
 # The problem is solved using PuLP's choice of Solver
 prob.solve()
 

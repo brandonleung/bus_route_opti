@@ -6,6 +6,7 @@ seed(1)
 
 # --- model data ---
 
+# set R of r routes
 routes = ["r1","r2","r3"]
 
 # cost of alternative, high alternative only used if bus route infeasible
