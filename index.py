@@ -6,7 +6,7 @@ seed(1)
 # --- model data ---
 
 events = { #            food pounds, dollars, meals yield, annual min, annual max
-    "food_drive":       [300,0,231,1900,4200],
+    "food_drive":       [300,0,231,500,4200],
     "church_drive_1":   [128000,8897,143045,1,9],
     "church_drive_2":   [0,826,4125,1,3],
     "media_1":          [20000,100000,515400,1,3],
@@ -58,19 +58,50 @@ resources = {       # unit, annual pool
     "meals":        ["d",25000]
 }
 
+# (event,resource), cost
 resource_cost = {}
 for e in events:
     for r_key,r_value in resources.items():
-        k = "(" + e + "," + r_key + ")"
-        resource_cost[k] = randint(0, 0.02*r_value[1])
+        if (e is not "food_drive" and e is not "media_1"):
+            k = e + "," + r_key
+            resource_cost[k] = randint(0, 0.02*r_value[1])
+
+food_drive = [3,5,0,0,0,1,0,0,1,1,10,57,0]
+media_1 = [138,0,0,16,25,14,25,25,6,14,667,220,3800,400]
+
+for i,r in enumerate(resources.keys()):
+    resource_cost["food_drive,"+r] = food_drive[i]
+    resource_cost["media_1,"+r] = media_1[i]
+
+# create dicts
+(pounds, dollars, meals, mins, maxs) = splitDict(events)
+(unit, annual_pool) = splitDict(resources)
 
 # --- decision variables ---
-x = LpVariable.dicts("m_od", events, 0, None, LpInteger)
+x = LpVariable.dicts("event", events, 0, None, LpInteger)
 
-# --- maximizing demand objective function 1 ---
-max_meals = LpProblem("MaximizeMeals", LpMaximize)
-# max_demand += lpSum([m_od[i][j]*passenger_demand[i][j] for (i,j) in segments]), "Sum_of_Demand_Served"
+# --- objective function ---
+prob = LpProblem("MaximizeMeals", LpMaximize)
+prob += lpSum([x[e]*meals[e] for e in events.keys()]), "Sum_of_Demand_Served"
 
-# max_demand.solve()
-# print(LpStatus[max_demand.status])
-# print(value(max_demand.objective))
+# --- resource supply constraint ---
+for r in resources.keys():
+    prob += lpSum([x[e]*resource_cost[e + "," + r] for e in events.keys()]) <= annual_pool[r], "Sum_of_Resources_%s_Used"%r
+
+# --- event min constraint ---
+for e in events.keys():
+    prob += x[e] >= mins[e], "Min_%s_Event"%e
+
+# --- event max constraint ---
+for e in events.keys():
+    prob += x[e] <= maxs[e], "Max_%s_Event"%e
+
+prob.solve()
+
+# --- results ---
+print(LpStatus[prob.status])
+
+for v in prob.variables():
+    print(v.name, "=", v.varValue)
+
+print(value(prob.objective))
