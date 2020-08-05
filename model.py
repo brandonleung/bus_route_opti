@@ -42,24 +42,23 @@ events = { #            food pounds, dollars, meals yield, annual min, annual ma
     "pledge_3":         [0,65000,325000,1,1]
 }
 
-resources = {       # unit, annual pool
-    "staff":        ["h",21600],
-    "volunteers":   ["h",30000],
-    "ceo":          ["h",400],
-    "marketing":    ["h",1000],
-    "IS":           ["h",500],
-    "events":       ["h",5400],
-    "donor_mgmt":   ["h",800],
-    "board_members":["h",1200],
-    "ext_equipment":["t",3600],
-    "int_equipment":["f",4500],
-    "supplies":     ["d",100000],
-    "storage":      ["d",200000],
-    "meals":        ["d",25000]
+resources = { 
+    "staff":        21600,
+    "volunteers":   30000,
+    "ceo":          400,
+    "marketing":    1000,
+    "IS":           500,
+    "events":       5400,
+    "donor_mgmt":   800,
+    "board_members":1200,
+    "ext_equipment":3600,
+    "int_equipment":4500,
+    "supplies":     100000,
+    "storage":      200000,
+    "meals":        25000
 }
 
 (pounds, dollars, meals, mins, maxs) = splitDict(events)
-(unit, annual_pool) = splitDict(resources)
 
 # generate resources
 # (event,resource), cost
@@ -68,7 +67,7 @@ for e in events:
     for r_key,r_value in resources.items():
         if (e is not "food_drive" and e is not "media_1"):
             k = e + "," + r_key
-            resource_cost[k] = randint(0, 0.02*r_value[1])
+            resource_cost[k] = randint(0, 0.02*r_value)
 
 # add known resources
 food_drive = [3,5,0,0,0,1,0,0,1,1,10,57,0]
@@ -88,7 +87,7 @@ prob += lpSum([x[e]*meals[e] for e in events.keys()]), "Sum_of_Demand_Served"
 # --- constraints ---
 for r in resources.keys():
     # resource capacity
-    prob += lpSum([x[e]*resource_cost[e + "," + r] for e in events.keys()]) <= annual_pool[r], "Sum_of_Resources_%s_Used"%r
+    prob += lpSum([x[e]*resource_cost[e + "," + r] for e in events.keys()]) <= resources[r], "Sum_of_Resources_%s_Used"%r
 
 for e in events.keys():
     # min number of event
@@ -96,9 +95,6 @@ for e in events.keys():
     # max number of event
     prob += x[e] <= maxs[e], "Max_%s_Event"%e
     
-# distribution budget
-prob += (0.2/1.3)*lpSum([x[e]*pounds[e] for e in events.keys()]) <= lpSum([x[e]*dollars[e] for e in events.keys()]), "Distribution_Budget"
-
 # --- results ---
 prob.solve()
 
