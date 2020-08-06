@@ -6,7 +6,7 @@ seed(1)
 # --- model data ---
 
 events = { #            food pounds, dollars, meals yield, annual min, annual max
-    "food_drive":       [300,0,231,500,2000],
+    "food_drive":       [300,0,231,1900,4200],
     "church_drive_1":   [128000,8897,143045,1,9],
     "church_drive_2":   [0,826,4125,1,3],
     "media_1":          [20000,100000,515400,1,3],
